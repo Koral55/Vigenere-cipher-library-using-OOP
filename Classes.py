@@ -24,15 +24,15 @@ class Vigenere:
     @classmethod
     def code(cls, text, key_value):
         key = Key(text=text, value=key_value)
-        code = ""
+        coded_message = ""
         for x in range(len(text)):
             if text[x] == " ":
-                code += " "
+                coded_message += " "
             else:
                 for y in range(26):
                     if alphabet_table[y*26] == key.value[x]:
-                        code += alphabet_table[y*26 + alphabet_table.index(text[x])]
-        return code
+                        coded_message += alphabet_table[y*26 + alphabet_table.index(text[x])]
+        return coded_message
 
 
     @classmethod
