@@ -1,19 +1,20 @@
-import random
 from Alphabet_Table import alphabet_table
 
 
 class Key:
     def __init__(self, text, value):
         self.text = text
-        self.value = value
+        self.__value = value
 
-    def key_correction(self):
-        while len(self.value) < len(self.text) - self.text.count(" "):
-            for x in range(len(self.text) - self.text.count(" ") - len(self.value)):
-                self.value = self.value + self.value[x]
-        for x in range(len(self.text)):
-            if self.text[x] == " ":
-                self.value = self.value[:x] + " " + self.value[x:]
+    @property
+    def value(self):
+        while len(self.__value) < len(self.text) - self.text.count(" "):
+            for x in range(len(self.text) - self.text.count(" ") - len(self.__value)):
+                self.__value = self.__value + self.__value[x]
+            for x in range(len(self.text)):
+                if self.text[x] == " ":
+                    self.__value = self.__value[:x] + " " + self.__value[x:]
+        return self.__value
 
 
 class Vigenere:
@@ -21,41 +22,30 @@ class Vigenere:
         pass
 
     @classmethod
-    def code(cls, text, key):
+    def code(cls, text, key_value):
+        key = Key(text=text, value=key_value)
         code = ""
-        key = Key(text=text, value=key)
-        key.key_correction()
-        for number in range(len(text)):
-            if text[number] == " " and key.value[number] == " ":
-                code = code + " "
+        for x in range(len(text)):
+            if text[x] == " ":
+                code += " "
             else:
-                for x in range(26):
-                    if alphabet_table[x * 26] == text[number]:
-                        text_letter_position = x * 26
-                        break
-                for y in alphabet_table:
-                    if y == key.value[number]:
-                        key_letter_position = alphabet_table.index(y)
-                        break
-                code_letter_position = text_letter_position + key_letter_position
-                code = code + alphabet_table[code_letter_position]
+                for y in range(26):
+                    if alphabet_table[y*26] == key.value[x]:
+                        code += alphabet_table[y*26 + alphabet_table.index(text[x])]
         return code
 
 
     @classmethod
-    def decode(cls, code, key):
-        text = ""
-        key = Key(text=code, value=key)
-        key.key_correction()
-        for number in range(len(code)):
-            if key.value[number] == " " and code[number] == " ":
-                text = text + " "
-            else:
-                key_letter_position = alphabet_table.index(key.value[number])
-                for z in range(26):
-                    if alphabet_table[z * 26 + key_letter_position] == code[number]:
-                        code_letter_position = z * 26 + key_letter_position
-                        break
-                text_letter_position = code_letter_position - key_letter_position
-                text = text + alphabet_table[text_letter_position]
-        return text
+    def decode(cls, code, key_value):
+        uncoded_message = ""
+        key = Key(text=code, value=key_value)
+        for x in range(len(code)):
+            for y in range(26):
+                if alphabet_table[y*26] == key.value[x] and key.value[x] != " ":
+                    for w in range(26):
+                        if alphabet_table[y*26 + w] == code[x]:
+                            uncoded_message += alphabet_table[w]
+                elif key.value[x] == " ":
+                    uncoded_message += " "
+                    break
+        return uncoded_message
